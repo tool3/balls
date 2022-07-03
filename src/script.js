@@ -39,9 +39,6 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
   texture.repeat.x = textureRepeat.x;
   texture.repeat.y = textureRepeat.y;
 
-  gui.add(texture.repeat, 'x').name('texture repeat x').min(0.1).max(10);
-  gui.add(texture.repeat, 'y').name('texture repeat y').min(0.1).max(10);
-
   const ballMaterial = {
     clearcoat: 1.0,
     cleacoatRoughness: 0.1,
@@ -50,8 +47,14 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
     normalMap: texture,
     normalScale: new THREE.Vector2(0.15, 0.15),
     envMap: envmap.texture,
-    color: Math.random() * 0xffffff
+    color: new THREE.Color(Math.random() * 0xffffff).getHex()
   };
+
+  gui.add(texture.repeat, 'x').name('texture repeat x').min(0.1).max(100).step(0.1);
+  gui.add(texture.repeat, 'y').name('texture repeat y').min(0.1).max(100).step(0.1);
+  gui.addColor(ballMaterial, 'color').onChange((val) => {
+    ballMat.color.set(val);
+  });
 
   const ballGeo = new THREE.SphereGeometry(100, 64, 64);
 
@@ -103,7 +106,7 @@ new RGBELoader().setPath('textures/').load('cayley_interior_4k.hdr', function (h
 
   // tl.to(camera.position, { z: -300, y: 10 });
   // gsap.to(sphere1.position, { z: 100, duration: 2 });,
-  console.log(hdrmap);
+
   const scale = 1;
   const sphere = makeSpehre(
     hdrmap,
