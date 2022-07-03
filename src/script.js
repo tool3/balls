@@ -7,13 +7,54 @@ import { FlakesTexture } from './FlakesTexture';
 import gsap from 'gsap';
 
 const gui = new dat.GUI();
+const scene = new THREE.Scene();
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
 };
+const overlayGeometry = new THREE.PlaneBufferGeometry(2, 2, 1, 1);
+const overlayMaterial = new THREE.ShaderMaterial({
+  transparent: true,
+  uniforms: {
+    uAlpha: { value: 1 }
+  },
+  vertexShader: `
+  
+  void main() {
+    gl_Position = vec4(position, 1.0);
+  }
+   `,
+  fragmentShader: `
+  uniform float uAlpha;
+  void main() {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+  }
+  `
+});
+const overlay = new THREE.Mesh(overlayGeometry, overlayMaterial);
+scene.add(overlay);
+
+const element = document.querySelector('.loading-bar');
+const title = document.querySelector('.intro-title');
+
+const loadingManager = new THREE.LoadingManager(
+  (done) => {
+    gsap.delayedCall(0.5, () => {
+      gsap.to(overlayMaterial.uniforms.uAlpha, { duration: 3, value: 0 });
+      element.style.transform = `scaleY(0)`;
+      element.classList.add('ended');
+      title.style.opacity = 0;
+      setTimeout(() => {
+        title.style.display = 'none';
+      }, 2000);
+    });
+  },
+  (url, loaded, total) => {
+    element.style.transform = `scaleX(${loaded / total})`;
+  }
+);
 
 const canvas = document.querySelector('canvas.webgl');
-const scene = new THREE.Scene();
 
 const pointlight = new THREE.PointLight(0xffffff, 1);
 pointlight.position.set(200, 200, 200);
@@ -57,14 +98,9 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
   });
 
   const ballGeo = new THREE.SphereGeometry(100, 64, 64);
-
   const ballMat = new THREE.MeshPhysicalMaterial(ballMaterial);
+  
   ballMaterial.color = color;
-
-  envmap.texture.repeat.x = textureRepeat.x;
-  envmap.texture.repeat.y = textureRepeat.y;
-  envmap.texture.needsUpdate = true;
-
   ballMaterial.envMap = envmap.texture;
 
   const ballMesh = new THREE.Mesh(ballGeo, ballMat);
@@ -76,36 +112,20 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
 }
 
 const tl = gsap.timeline();
-new RGBELoader().setPath('textures/').load('cayley_interior_4k.hdr', function (hdrmap) {
-  // for (let i = 0; i < 2; i++) {
-  //   const color = Math.random() * 0xffffff;
-  //   // const scale = Math.random() * 2;
-  //   const scale = 2;
-  //   const sphere = makeSpehre(
-  //     hdrmap,
-  //     color,
-  //     { x: 1 + i * 2, y: 1, z: -100 },
-  //     // { x: (Math.random() - 0.5) * 3000, y: (Math.random() - 0.5) * 3000, z: (Math.random() - 0.5) * 3000 },
-  //     // { x: (Math.random() - 0.5) * 1000, y: (Math.random() - 0.5) * 1000, z: (Math.random() - 0.5) * 1000 },
-  //     { x: scale, y: scale, z: scale },
-  //     { x: 20, y: 20 }
-  //   );
-  //   console.log('made');
-  //   scene.add(sphere);
-  // }
-  // const sphere1 = makeSpehre(hdrmap, 'pink', { x: 150, y: 0, z: -1000 }, { x: 3, y: 3, z: 3 });
-  // scene.add(sphere1);
-  // const sphere1 = makeSpehre(hdrmap, 'yellow', {x: -50, y: 0, z: 0});
-  // const sphere2 = makeSpehre(hdrmap, 'blue', {x: 50, y: 0, z: 0});
-  // scene.add(sphere1);
-  // scene.add(sphere2);
-  // gsap.from(camera.position, { z: -20000, duration: 200 });
-  // tl.from(camera.position, { duration: 3, x: 1000 })
-  //   // .to(camera.position, { duration: 3, x: 100 })
-  //   .from(sphere1.position, { duration: 3, y: 100 });
+new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_4k.hdr', function (hdrmap) {
+  for (let i = 0; i < 50; i++) {
+    const scale = 1;
+    const sphere = makeSpehre(
+      hdrmap,
+      Math.random() * 0xffffff,
+      { x: (Math.random() - 0.5) * 3000, y: (Math.random() - 0.5) * 3000, z: (Math.random() - 0.5) * 3000 },
+      // { x: i, y: i, z: i },
+      { x: scale, y: scale, z: scale },
+      { x: 20, y: 20 }
+    );
 
-  // tl.to(camera.position, { z: -300, y: 10 });
-  // gsap.to(sphere1.position, { z: 100, duration: 2 });,
+    scene.add(sphere);
+  }
 
   const scale = 1;
   const sphere = makeSpehre(
@@ -115,14 +135,9 @@ new RGBELoader().setPath('textures/').load('cayley_interior_4k.hdr', function (h
     { x: scale, y: scale, z: scale },
     { x: 20, y: 20 }
   );
-  // const sphere1 = makeSpehre(
-  //   hdrmap,
-  //   Math.random() * 0xffffff,
-  //   { x: 0, y: 0, z: 100 },
-  //   { x: scale, y: scale, z: scale },
-  //   { x: 10, y: 6 }
-  // );
+
   scene.add(sphere);
+  // camera.lookAt(sphere);
 });
 
 const camera = new THREE.PerspectiveCamera(70, sizes.width / sizes.height, 0.1, 10000);
@@ -132,10 +147,50 @@ scene.add(camera);
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
+controls.minDistance = 0.1;
+controls.maxDistance = 10000;
 
 /**
  * Renderer
  */
+let INTERSECTED;
+const pointer = new THREE.Vector2();
+
+const raycaster = new THREE.Raycaster();
+window.addEventListener('resize', onWindowResize);
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+window.addEventListener('mousemove', onPointerMove);
+function onPointerMove(event) {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+window.addEventListener('dblclick', function (e) {
+  const intersects = raycaster.intersectObjects(scene.children, false);
+
+  if (intersects.length > 0) {
+    // console.log('fired', intersects[0].object);
+    const target = intersects[0].object;
+    gsap.to(camera.position, {
+      duration: 1,
+      x: 10,
+      y: 10,
+      z: 10,
+      onUpdate: function () {
+        camera.lookAt(target.position.x, target.position.y, target.position.z);
+        controls.target.set(target.position.x, target.position.y, target.position.z);
+        camera.updateMatrixWorld();
+      }
+    });
+  }
+});
 
 const clock = new THREE.Clock();
 let previousTime = 0;
@@ -145,6 +200,29 @@ const tick = () => {
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
   controls.update();
+
+  camera.updateMatrixWorld();
+
+  raycaster.setFromCamera(pointer, camera);
+
+  const intersects = raycaster.intersectObjects(scene.children, false);
+
+  if (intersects.length > 0) {
+    if (INTERSECTED != intersects[0].object) {
+      if (INTERSECTED) {
+        INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+      }
+
+      INTERSECTED = intersects[0].object;
+      INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+      INTERSECTED.material.emissive.setHex(INTERSECTED.material.color.getHex());
+      INTERSECTED.material.emissiveIntensity = 0.5;
+    }
+  } else {
+    if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+    INTERSECTED = null;
+  }
+
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };

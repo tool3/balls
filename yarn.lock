@@ -4558,6 +4558,11 @@ terser@^5.10.0, terser@^5.7.2:
     source-map "~0.7.2"
     source-map-support "~0.5.20"
 
+three.interaction-fixed@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/three.interaction-fixed/-/three.interaction-fixed-0.2.3.tgz#136dd6aca54ece1a3f30c8d742e21e82886368cd"
+  integrity sha512-X1E+EJeP8gVn6EUbPIFYLPldtoWpaBmaIZXJigWLrZUlKSuFvF+WcvNq9iBvM4gmSBacEYZcoDH5F6JxtTwtzA==
+
 three.interaction@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/three.interaction/-/three.interaction-0.2.3.tgz#f7947b4e44649a822335b03b1dcc68c659d71c04"
