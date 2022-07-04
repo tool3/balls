@@ -173,7 +173,28 @@ function onPointerMove(event) {
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
+document.getElementById('double-tap').addEventListener('touchstart', tapHandler);
+
+let tapedTwice = false;
+
+function tapHandler(event) {
+  if (!tapedTwice) {
+    tapedTwice = true;
+    setTimeout(function () {
+      tapedTwice = false;
+    }, 300);
+    return false;
+  }
+  event.preventDefault();
+  //action on double tap goes below
+  lock();
+}
+
 window.addEventListener('dblclick', function (e) {
+  lock();
+});
+
+function lock() {
   const intersects = raycaster.intersectObjects(scene.children, false);
 
   if (intersects.length > 0) {
@@ -191,7 +212,7 @@ window.addEventListener('dblclick', function (e) {
       }
     });
   }
-});
+}
 
 const clock = new THREE.Clock();
 let previousTime = 0;
