@@ -7,6 +7,7 @@ import { FlakesTexture } from './FlakesTexture';
 import gsap from 'gsap';
 
 const gui = new dat.GUI();
+gui.close();
 const scene = new THREE.Scene();
 const sizes = {
   width: window.innerWidth,
@@ -112,7 +113,7 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
 }
 
 const tl = gsap.timeline();
-new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_4k.hdr', function (hdrmap) {
+new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_2k.hdr', function (hdrmap) {
   for (let i = 0; i < 50; i++) {
     const scale = 1;
     const sphere = makeSpehre(
