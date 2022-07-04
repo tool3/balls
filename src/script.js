@@ -173,8 +173,6 @@ function onPointerMove(event) {
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
-document.getElementById('double-tap').addEventListener('touchstart', tapHandler);
-
 let tapedTwice = false;
 
 function tapHandler(event) {
@@ -192,6 +190,10 @@ function tapHandler(event) {
 
 window.addEventListener('dblclick', function (e) {
   lock();
+});
+
+window.addEventListener('touchstart', function (e) {
+  tapHandler(e);
 });
 
 function lock() {
