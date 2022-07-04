@@ -192,9 +192,9 @@ window.addEventListener('dblclick', function (e) {
   lock();
 });
 
-window.addEventListener('touchstart', function (e) {
-  tapHandler(e);
-});
+// window.addEventListener('touchstart', function (e) {
+//   tapHandler(e);
+// });
 
 function lock() {
   const intersects = raycaster.intersectObjects(scene.children, false);
