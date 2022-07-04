@@ -113,8 +113,8 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
 }
 
 const tl = gsap.timeline();
-new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_2k.hdr', function (hdrmap) {
-  for (let i = 0; i < 50; i++) {
+new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_4k.hdr', function (hdrmap) {
+  for (let i = 0; i < 1; i++) {
     const scale = 1;
     const sphere = makeSpehre(
       hdrmap,
