@@ -82,7 +82,7 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
 
   const ballMaterial = {
     clearcoat: 1.0,
-    cleacoatRoughness: 0.1,
+    clearcoatRoughness: 0.1,
     metalness: 0.9,
     roughness: 0.5,
     normalMap: texture,
@@ -99,7 +99,7 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
 
   const ballGeo = new THREE.SphereGeometry(100, 64, 64);
   const ballMat = new THREE.MeshPhysicalMaterial(ballMaterial);
-  
+
   ballMaterial.color = color;
   ballMaterial.envMap = envmap.texture;
 
@@ -180,9 +180,9 @@ window.addEventListener('dblclick', function (e) {
     const target = intersects[0].object;
     gsap.to(camera.position, {
       duration: 1,
-      x: 10,
+      x: 100,
       y: 10,
-      z: 10,
+      z: 100,
       onUpdate: function () {
         camera.lookAt(target.position.x, target.position.y, target.position.z);
         controls.target.set(target.position.x, target.position.y, target.position.z);
