@@ -5,6 +5,7 @@ import * as dat from 'dat.gui';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { FlakesTexture } from './FlakesTexture';
 import gsap from 'gsap';
+import { TextureLoader } from 'three';
 
 const gui = new dat.GUI();
 gui.close();
@@ -113,8 +114,8 @@ function makeSpehre(hdrmap, color, position, scale, textureRepeat) {
 }
 
 const tl = gsap.timeline();
-new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_4k.hdr', function (hdrmap) {
-  for (let i = 0; i < 1; i++) {
+new TextureLoader(loadingManager).setPath('textures/').load('cayley_interior_4k.jpeg', function (hdrmap) {
+  for (let i = 0; i < 50; i++) {
     const scale = 1;
     const sphere = makeSpehre(
       hdrmap,
@@ -122,7 +123,7 @@ new RGBELoader(loadingManager).setPath('textures/').load('cayley_interior_4k.hdr
       { x: (Math.random() - 0.5) * 3000, y: (Math.random() - 0.5) * 3000, z: (Math.random() - 0.5) * 3000 },
       // { x: i, y: i, z: i },
       { x: scale, y: scale, z: scale },
-      { x: 20, y: 20 }
+      { x: 10, y: 6 }
     );
 
     scene.add(sphere);
